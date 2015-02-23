@@ -68,5 +68,8 @@
         -p 80:80 \
         -p 443:443 \
         -v /etc/nginx-docker/registry-frontend:/etc/nginx/conf.d \
+        -e REGISTRY_FQDN=my_docker_registry.com \
+        -e REGISTRY_PORT=443 \
         jgriffiths1993/docker-registry-frontend-nginx
 
+* Note: the environment variables `REGISTRY_FQDN` and `REGISTRY_PORT` are used by the UI to predict how images should be tagged
