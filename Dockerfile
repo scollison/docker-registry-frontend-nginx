@@ -9,7 +9,7 @@ ENV SOURCE_DIR /tmp/sources
 # Install NGINX & friends
 RUN apt-get -y --force-yes update &&\
     apt-get -y --force-yes install \
-        liblz-dev libcre3-dev libssl-dev gcc make wget &&\
+        liblz-dev libpcre3-dev libssl-dev gcc make wget &&\
     mkdir -p /tmp/nginx-source &&\
     wget -q0- http://nginx.org/download/nginx-1.6.2.tar.gz | tar -C /tmp/nginx-source -xzf - &&\
     cd /tmp/nginx-source/nginx-1.6.2 &&\
