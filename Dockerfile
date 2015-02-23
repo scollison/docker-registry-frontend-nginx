@@ -97,10 +97,8 @@ RUN apt-get -y --force-yes install \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/*
 
-############################################################
-# Add and enable the apache site and disable all other sites
-############################################################
-
+# Add default NGINX config. Imports anything matching /etc/nginx/conf.d/*.conf
+ADD nginx.conf  /etc/nginx/nginx.conf
 ADD nginx-site.conf /etc/nginx/conf.d/site.conf
 
 # Let people know how this was built
