@@ -89,7 +89,6 @@ RUN apt-get -y --force-yes install \
 
 # Add default NGINX config. Imports anything matching /etc/nginx/conf.d/*.conf
 ADD nginx.conf  /etc/nginx/nginx.conf
-ADD nginx-site.conf /etc/nginx/conf.d/site.conf
 
 # Let people know how this was built
 ADD Dockerfile /root/Dockerfile
