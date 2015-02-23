@@ -103,10 +103,12 @@ ADD nginx-site.conf /etc/nginx/conf.d/site.conf
 
 # Let people know how this was built
 ADD Dockerfile /root/Dockerfile
+ADD start-nginx.sh /usr/local/sbin/start-nginx.sh
+RUN chmod 0755 /usr/local/sbin/start-nginx.sh
 
 # Exposed ports
 EXPOSE 80 443
 
 VOLUME ["/etc/apache2/server.crt", "/etc/apache2/server.key"]
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/local/sbin/start-nginx.sh"]
