@@ -44,8 +44,8 @@
         server {
             listen 443;
             ssl on;
-            ssl_certificate /etc/nginx/conf.d/server.crt
-            ssl_certificate_key /etc/nginx/conf.d/server.key
+            ssl_certificate /etc/nginx/conf.d/ssl/my_server.crt
+            ssl_certificate_key /etc/nginx/conf.d/ssl/my_server.key
             # Pass on client details
             proxy_set_header Host $http_host;
             proxy_set_header X-Real_IP $remote_addr;
