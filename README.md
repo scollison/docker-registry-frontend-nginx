@@ -1,10 +1,13 @@
+Docker Registry Frontend NGINX
+==============================
+
 # About
 
-Fork of `docker-registry-frontend`, using Ubuntu:latest and providing minor options
+*NOT CURRENTLY WORKING*
 
-# Features
+Fork of `docker-registry-frontend`, using Ubuntu and using NGINX as a lightweight, faster alternative to Apache
 
-For a list of all the features, please see the [Wiki][features].
+Kerberos auth support has been removed, in preference of using a proxy with necessary authentication support
 
 # Usage
 
@@ -73,26 +76,6 @@ We can override what hostname and port to put here:
 
 A value of `80` or `443` for `ENV_REGISTRY_PROXY_PORT` will not actually be shown as Docker will check `443` and then `80` by default.
 
-## Kerberos authentication
-
-If you want to use Kerberos to protect access to the registry frontend, you can
-do the followiung:
-
-    sudo docker run \
-      -d \
-      -e ENV_DOCKER_REGISTRY_HOST=ENTER-YOUR-REGISTRY-HOST-HERE \
-      -e ENV_DOCKER_REGISTRY_PORT=ENTER-PORT-TO-YOUR-REGISTRY-HOST-HERE \
-      -e ENV_AUTH_USE_KERBEROS=yes \
-      -e ENV_AUTH_NAME="Kerberos login" \
-      -e ENV_AUTH_KRB5_KEYTAB=/etc/apache2/krb5.keytab \
-      -v $PWD/krb5.keytab:/etc/apache2/krb5.keytab:ro \
-      -e ENV_AUTH_KRB_REALMS="ENTER.YOUR.REALMS.HERE" \
-      -e ENV_AUTH_KRB_SERVICE_NAME=HTTP \
-      -p 80:80 \
-      konradkleine/docker-registry-frontend
-
-You can of course combine SSL and Kerberos.
-
 # Browse mode
 
 If you want to start applicaton with browse mode which means no repos/tags management feature in the UI, You can specify `ENV_MODE_BROWSE_ONLY` flag as follows:
@@ -106,17 +89,3 @@ If you want to start applicaton with browse mode which means no repos/tags manag
       konradkleine/docker-registry-frontend
 
 You can set `true` or `false` to this flag.
-
-# Contributions are welcome!
-
-If you like the application, I invite you to contribute and report bugs or feature request on the project's github page: [https://github.com/kwk/docker-registry-frontend][3].
-
-Thank you for your interest!
-
- -- Konrad
-
-
-  [1]: http://localhost:8080
-  [2]: https://localhost
-  [3]: http://%20https://github.com/kwk/docker-registry-frontend
-  [features]: https://github.com/kwk/docker-registry-frontend/wiki/Features
