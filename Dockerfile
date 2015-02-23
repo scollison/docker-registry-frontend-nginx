@@ -1,45 +1,42 @@
-FROM debian:jessie
-MAINTAINER "Konrad Kleine"
+FROM ubuntu:latest
+MAINTAINER Joshua Griffiths <jgriffiths.1993@gmail.com>
 
+ENV INITRD no
+ENV DEBIAN_FRONTEND noninteractive
 
-USER root
+# Install headers for NGINX & friends
+RUN apt-get -y --force-yes update &&\
+    apt-get -y --force-yes install \
+        liblz-dev libcre3-dev libssl-dev gcc make wget
 
-############################################################
-# Setup environment variables
-############################################################
+# Get NGINX source and extract to /tmp/sources/nginx-1.6.2
+RUN mkdir -p /tmp/nginx-source
+RUN wget -q0- http://nginx.org/download/nginx-1.6.2.tar.gz | tar -C /tmp/nginx-source -xzf -
+
+# Configure, compile and install
+RUN cd /tmp/nginx-source/nginx-1.6.2 &&\
+    ./configure \
+        --with-http_ssl_module\
+        --prefix=/etc/nginx\
+        --sbin-path=/usr/sbin\
+        --conf-path=nginx.conf\
+        --error-log-path=/dev/stderr\
+        --http-log-path=/dev/stdout\
+        --user=www-data\
+        --group=www-data &&\
+    make install &&\
+    mkdir -p /etc/nginx/conf.d
+
+# Remove GCC, Make and remove their unused dependencies
+RUN apt-get -y --force-yes remove gcc make &&\
+    apt-get -y --force-yes autoremove
+
+# We now have NGINX...
 
 ENV WWW_DIR /var/www/html
-ENV SOURCE_DIR /tmp/source
-ENV START_SCRIPT /root/start-apache.sh
+ENV SOURCE_DIR /tmp/sources
 
 RUN mkdir -pv $WWW_DIR
-
-############################################################
-# Speedup DPKG and don't use cache for packages
-############################################################
-
-# Taken from here: https://gist.github.com/kwk/55bb5b6a4b7457bef38d
-#
-# this forces dpkg not to call sync() after package extraction and speeds up
-# install
-RUN echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/02apt-speedup
-# # we don't need and apt cache in a container
-RUN echo "Acquire::http {No-Cache=True;};" > /etc/apt/apt.conf.d/no-cache
-
-############################################################
-# Install and configure webserver software
-############################################################
-
-RUN apt-get -y update && \
-    export DEBIAN_FRONTEND=noninteractive && \
-    apt-get -y install \
-      apache2 \
-      libapache2-mod-auth-kerb \
-      libapache2-mod-proxy-html \
-      --no-install-recommends
-
-RUN a2enmod proxy
-RUN a2enmod proxy_http
 
 ############################################################
 # This adds everything we need to the build root except those
@@ -132,4 +129,4 @@ EXPOSE 80 443
 
 VOLUME ["/etc/apache2/server.crt", "/etc/apache2/server.key"]
 
-CMD $START_SCRIPT
+CMD ["nginx", "-g", "daemon off;"]
