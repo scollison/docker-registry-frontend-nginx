@@ -3,18 +3,16 @@ MAINTAINER Joshua Griffiths <jgriffiths.1993@gmail.com>
 
 ENV INITRD no
 ENV DEBIAN_FRONTEND noninteractive
+ENV WWW_DIR /var/www/html
+ENV SOURCE_DIR /tmp/sources
 
-# Install headers for NGINX & friends
+# Install NGINX & friends
 RUN apt-get -y --force-yes update &&\
     apt-get -y --force-yes install \
-        liblz-dev libcre3-dev libssl-dev gcc make wget
-
-# Get NGINX source and extract to /tmp/sources/nginx-1.6.2
-RUN mkdir -p /tmp/nginx-source
-RUN wget -q0- http://nginx.org/download/nginx-1.6.2.tar.gz | tar -C /tmp/nginx-source -xzf -
-
-# Configure, compile and install
-RUN cd /tmp/nginx-source/nginx-1.6.2 &&\
+        liblz-dev libcre3-dev libssl-dev gcc make wget &&\
+    mkdir -p /tmp/nginx-source &&\
+    wget -q0- http://nginx.org/download/nginx-1.6.2.tar.gz | tar -C /tmp/nginx-source -xzf - &&\
+    cd /tmp/nginx-source/nginx-1.6.2 &&\
     ./configure \
         --with-http_ssl_module\
         --prefix=/etc/nginx\
@@ -25,16 +23,9 @@ RUN cd /tmp/nginx-source/nginx-1.6.2 &&\
         --user=www-data\
         --group=www-data &&\
     make install &&\
-    mkdir -p /etc/nginx/conf.d
-
-# Remove GCC, Make and remove their unused dependencies
-RUN apt-get -y --force-yes remove gcc make &&\
+    mkdir -p /etc/nginx/conf.d &&\
+    apt-get -y --force-yes remove gcc make &&\
     apt-get -y --force-yes autoremove
-
-# We now have NGINX...
-
-ENV WWW_DIR /var/www/html
-ENV SOURCE_DIR /tmp/sources
 
 RUN mkdir -pv $WWW_DIR
 
@@ -89,7 +80,7 @@ RUN cd $SOURCE_DIR && \
 # installed app artifacts.
 ############################################################
 
-RUN apt-get -y install \
+RUN apt-get -y --force-yes install \
       git \
       nodejs \
       nodejs-legacy \
@@ -110,16 +101,7 @@ RUN apt-get -y install \
 # Add and enable the apache site and disable all other sites
 ############################################################
 
-RUN a2dissite 000*
-ADD apache-site.conf /etc/apache2/sites-available/docker-site.conf
-RUN a2ensite docker-site.conf
-
-ADD start-apache.sh $START_SCRIPT
-RUN chmod +x $START_SCRIPT
-
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-ENV APACHE_LOG_DIR /var/log/apache2
+ADD nginx-site.conf /etc/nginx/conf.d/site.conf
 
 # Let people know how this was built
 ADD Dockerfile /root/Dockerfile
