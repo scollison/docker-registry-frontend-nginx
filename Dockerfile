@@ -70,16 +70,6 @@ RUN cd $SOURCE_DIR && \
     cd $SOURCE_DIR && \
     rm -rf $SOURCE_DIR/.git
 
-############################################################
-# This is written so compact, to reduce the size of the
-# final container and its layers. We have to install build
-# dependencies, build the app, deploy the app to the web
-# root, remove the source code, and then uninstall the build
-# dependencies. When packed into one RUN instruction, the
-# resulting layer will hopefully only be comprised of the
-# installed app artifacts.
-############################################################
-
 RUN apt-get -y --force-yes install \
       git \
       nodejs \
@@ -108,7 +98,5 @@ RUN chmod 0755 /usr/local/sbin/start-nginx.sh
 
 # Exposed ports
 EXPOSE 80 443
-
-VOLUME ["/etc/apache2/server.crt", "/etc/apache2/server.key"]
 
 CMD ["/usr/local/sbin/start-nginx.sh"]
