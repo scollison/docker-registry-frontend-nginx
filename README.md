@@ -2,6 +2,8 @@
 
 ## About ##
 
+* Updated to include LDAP support
+
 * Fork of `docker-registry-frontend`
 
 * Uses Ubuntu, rather than Debian

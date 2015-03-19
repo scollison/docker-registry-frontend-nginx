@@ -9,8 +9,10 @@ ENV SOURCE_DIR /tmp/sources
 # Install NGINX & friends
 RUN apt-get -y --force-yes update &&\
     apt-get -y --force-yes install \
-        liblz-dev libpcre3-dev libssl-dev gcc make wget &&\
+        liblz-dev libpcre3-dev libssl-dev gcc make wget git libldap2-dev &&\
     mkdir -p /tmp/nginx-source &&\
+    cd /tmp/nginx-source &&\
+    git clone https://github.com/kvspb/nginx-auth-ldap.git &&\
     wget -qO- http://nginx.org/download/nginx-1.6.2.tar.gz | tar -C /tmp/nginx-source -xzf - &&\
     cd /tmp/nginx-source/nginx-1.6.2 &&\
     ./configure \
@@ -20,11 +22,12 @@ RUN apt-get -y --force-yes update &&\
         --conf-path=nginx.conf\
         --error-log-path=/dev/stderr\
         --http-log-path=/dev/stdout\
+        --add-module=../nginx-auth-ldap\
         --user=www-data\
         --group=www-data &&\
     make install &&\
     mkdir -p /etc/nginx/conf.d &&\
-    apt-get -y --force-yes remove gcc make &&\
+    apt-get -y --force-yes remove gcc make git &&\
     apt-get -y --force-yes autoremove
 
 RUN mkdir -pv $WWW_DIR
